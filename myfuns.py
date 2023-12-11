@@ -18,25 +18,25 @@ movies['movie_id'] = movies['movie_id'].astype(int)
 
 # data = pd.read_csv("data/Rmat.csv")
 
-# def grab_count(row):
-#         if row["movie_id"] in ratings_count:
-#             return ratings_count[row["movie_id"]]
-#         else:
-#             return 0
+def grab_count(row):
+        if row["movie_id"] in ratings_count:
+            return ratings_count[row["movie_id"]]
+        else:
+            return 0
         
-# def grab_average_rating(row):
-#     reviews = ratings_data[ratings_data["movie_id"] == row["movie_id"]]
-#     if reviews.shape[0] == 0:
-#         return 0
-#     return reviews["Rating"].mean()
+def grab_average_rating(row):
+    reviews = ratings_data[ratings_data["movie_id"] == row["movie_id"]]
+    if reviews.shape[0] == 0:
+        return 0
+    return reviews["Rating"].mean()
 
-# ratings_data = pd.read_csv("data/ratings.dat", sep=":", header=None)
-# ratings_data = ratings_data.drop([1, 3, 5], axis=1)
-# ratings_data = ratings_data.rename(columns={0 : "UserID", 2 : "movie_id", 4 : "Rating", 6 : "Timestamp"})
-# ratings_count = ratings_data["movie_id"].value_counts()
+ratings_data = pd.read_csv("data/ratings.dat", sep=":", header=None)
+ratings_data = ratings_data.drop([1, 3, 5], axis=1)
+ratings_data = ratings_data.rename(columns={0 : "UserID", 2 : "movie_id", 4 : "Rating", 6 : "Timestamp"})
+ratings_count = ratings_data["movie_id"].value_counts()
 
-# movies["Ratings_Count"] = movies.apply(grab_count, axis=1)
-# movies["Avg_Rating"] = movies.apply(grab_average_rating, axis=1)
+movies["Ratings_Count"] = movies.apply(grab_count, axis=1)
+movies["Avg_Rating"] = movies.apply(grab_average_rating, axis=1)
 
 genres = list(
     sorted(set([genre for genres in movies.genres.unique() for genre in genres.split("|")]))
@@ -106,8 +106,6 @@ def get_displayed_movies():
 def get_recommended_movies(new_user_ratings):
     return movies.head(10)
 
-def get_popular_movies():
-    return movies.head(10)
 # def get_recommended_movies(new_user_ratings):
 #     user = data.loc["u1181"].copy()
 #     for col in data.columns:
@@ -124,14 +122,14 @@ def get_popular_movies():
 #         ids.append(int(movie_id[1:]))
 #     return movies.iloc[ids]
 
-# def get_popular_movies(genre: str):
-#     movies_in_genre = movies[movies["genres"].str.contains(genre)].copy()
+def get_popular_movies(genre: str):
+    movies_in_genre = movies[movies["genres"].str.contains(genre)].copy()
 
-#     movies_in_genre['Ratings_Count'] = (movies_in_genre['Ratings_Count'] - movies_in_genre['Ratings_Count'].mean()) / movies_in_genre['Ratings_Count'].std()
-#     movies_in_genre['Avg_Rating'] = (movies_in_genre['Avg_Rating'] - movies_in_genre['Avg_Rating'].mean()) / movies_in_genre['Avg_Rating'].std()
-#     movies_in_genre["Recommendation_Rating"] = movies_in_genre['Ratings_Count'] + movies_in_genre['Avg_Rating']
+    movies_in_genre['Ratings_Count'] = (movies_in_genre['Ratings_Count'] - movies_in_genre['Ratings_Count'].mean()) / movies_in_genre['Ratings_Count'].std()
+    movies_in_genre['Avg_Rating'] = (movies_in_genre['Avg_Rating'] - movies_in_genre['Avg_Rating'].mean()) / movies_in_genre['Avg_Rating'].std()
+    movies_in_genre["Recommendation_Rating"] = movies_in_genre['Ratings_Count'] + movies_in_genre['Avg_Rating']
     
-#     movies_in_genre = movies_in_genre.sort_values(by=["Recommendation_Rating"], ascending=False)
+    movies_in_genre = movies_in_genre.sort_values(by=["Recommendation_Rating"], ascending=False)
     
-#     num_picks = 10
-#     return movies_in_genre.iloc[:num_picks]
+    num_picks = 10
+    return movies_in_genre.iloc[:num_picks]
