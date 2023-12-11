@@ -46,21 +46,25 @@ def get_displayed_movies():
     return movies.head(100)
 
 def ibcf(newuser):
+    # subset_size = 1000
+
     num_top_movies = 10
-    similarities = pd.read_csv("data/similarity_30.csv").fillna(0)
+    # nib = pd.read_csv("data/similarity_30.csv").iloc[:subset_size, :(subset_size + 1)]
+    # nib.to_csv("data/similarity_30_small.csv", index=False)
+    similarities = pd.read_csv("data/similarity_30_small.csv").fillna(0)
     similarities = np.array(similarities.drop(["movie_ids"], axis=1))
 
-    newuser = np.array(newuser).flatten()
+    subset_size = similarities.shape[0]
+    newuser = np.array(newuser).flatten()[:subset_size]
     predictions = np.full(newuser.shape, np.nan) 
 
     unrated_movies = np.where(np.isnan(newuser))[0]
     for l in unrated_movies:
 
         neighborhood = similarities[l,:]
-        
         top_similar_indices = ~np.isnan(neighborhood)
-        top_similarities = neighborhood[top_similar_indices]
 
+        top_similarities = neighborhood[top_similar_indices]
         rated_by_user = ~np.isnan(newuser[top_similar_indices])
         
         if rated_by_user.any():
@@ -104,24 +108,22 @@ def ibcf(newuser):
 
 
 def get_recommended_movies(new_user_ratings):
-    # user = pd.read_csv("data/movie_ids.csv")["u1"]
-    # user.index = movie_ids
-    # for col in list(movie_ids):
-    #     user[col] = np.NaN
+    user = pd.read_csv("data/movie_ids.csv")["u1"]
+    user.index = movie_ids
+    for col in list(movie_ids):
+        user[col] = np.NaN
 
-    # for movie_id in new_user_ratings:
-    #     full_id = f"m{movie_id}"
-    #     user[full_id] = new_user_ratings[movie_id]
+    for movie_id in new_user_ratings:
+        full_id = f"m{movie_id}"
+        user[full_id] = new_user_ratings[movie_id]
         
-    # top_movies, predictions = ibcf(user)
+    top_movies, predictions = ibcf(user)
     
-    # ids = []
-    # for movie_id in top_movies:
-    #     ids.append(int(movie_id[1:]))
-    similarities = pd.read_csv("data/similarity_30.csv").fillna(0)
-    similarities = np.array(similarities.drop(["movie_ids"], axis=1))
-    return movies.head(10)
-    # return movies.iloc[ids]
+    ids = []
+    for movie_id in top_movies:
+        ids.append(int(movie_id[1:]))
+
+    return movies.iloc[ids]
 
 def get_popular_movies(genre: str):
     movies_in_genre = movies[movies["genres"].str.contains(genre)].copy()
